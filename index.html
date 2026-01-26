@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pisco Rush</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <main class="app">
+
+      <!-- START SCREEN -->
+      <section id="start-screen" class="screen">
+        <img
+          class="logo"
+          src="images/logo.png"
+          alt="Pisco Rush logo"
+        />
+
+        <p class="instructions">
+          Catch the ingredients in order:
+          <strong>ICE → PISCO → COLA</strong><br />
+          Wrong order or wrong bottle = lose a life!
+        </p>
+
+        <button id="start-btn" class="btn">
+          <img src="images/StartPlaying.png" alt="Start" />
+        </button>
+      </section>
+
+      <!-- GAME SCREEN -->
+      <section id="game-screen" class="container">
+
+        <!-- HUD -->
+        <header class="hud">
+          <div class="hud-block">
+            <span class="hud-label">Score</span>
+            <span id="score">0</span>
+          </div>
+
+          <div class="hud-block">
+            <span class="hud-label">Lives</span>
+            <div id="lives" class="lives">
+              <img src="images/LifeGlass.png" alt="life" />
+              <img src="images/LifeGlass.png" alt="life" />
+              <img src="images/LifeGlass.png" alt="life" />
+            </div>
+          </div>
+
+          <div class="hud-block">
+            <span class="hud-label">Next</span>
+            <span id="next-step">ICE</span>
+          </div>
+        </header>
+
+        <!-- GAME AREA -->
+        <div id="game-area" class="game-area">
+          <img
+            id="player"
+            class="player"
+            src="images/emptyGlass.png"
+            alt="glass"
+           
+          />
+          <!-- Falling items go here -->
+        </div>
+
+      </section>
+
+      <!-- GAME OVER SCREEN -->
+      <section id="gameover-screen" class="container">
+        <img
+          class="gameover-img"
+          src="images/GameOver.png"
+          alt="Game Over"
+        />
+
+        <p class="instructions">
+          You missed the recipe.<br />
+          Want another round?
+        </p>
+
+        <button id="restart-btn" class="btn">
+          <img src="images/Restart.png" alt="Restart" />
+        </button>
+      </section>
+
+    </main>
+
+    <script src="main.js"></script>
+  </body>
+</html>
