@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f0f12;
+  color: white;
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+/* Background container */
+.game-wrapper {
+  position: relative;
+  width: 1470px;
+  max-width: 95vw;
+  height: 720px;
+  margin: 0 auto;
+
+  border-radius: 16px;
+  overflow: hidden;
+
+  background-image: url("./images/background.png");
+  background-size: 150%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* IMPORTANT: base layer behavior */
+.ui-layer {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* horizontal center */
+}
+
+/* Start UI: top aligned */
+#start-ui {
+  justify-content: flex-start; /* vertical top */
+  padding-top: 20px;           /* move down from top */
+  gap: 80px;
+}
+
+.logo {
+  width: 400px;
+  max-width: 90%;
+  height: auto;
+ 
+}
+
+
+.instructions {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: center;
+
+  background: rgba(0, 0, 0, 0.6);
+  padding: 14px 18px;
+  border-radius: 12px;
+
+  max-width: 600px;
+}
+
+
+.btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn img {
+  width: 320px;
+  max-width: 90%;
+  height: auto;
+}
+
+
+/* Hide layers */
+.hidden {
+  display: none;
+}
+
+/* HUD stays at top */
+.hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: center;
+
+  background: rgba(0, 0, 0, 0.6);
+  padding: 14px 18px;
+  border-radius: 12px;
+
+  max-width: 600px;
+}
+
+.lives img {
+  width: 34px;
+  height: 24px;
+}
+
+.hud-block {
+  display: flex;
+  gap: 20px;
+}
+
+/* Game area */
+.game-area {
+  position: absolute;
+  inset: 0;
+}
+
+/* Player */
+.player {
+  position: absolute;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: 150px;  /* size of the player*/
+}
+
+
+.falling {
+  position: absolute;
+  width: 200px;     /* size of the falling item */
+  height: auto;
+}
