@@ -1,3 +1,5 @@
+
+
 // ===== DOM =====
 
 const startUI = document.querySelector("#start-ui");
@@ -9,6 +11,8 @@ const restartBtn = document.querySelector("#restart-btn");
 
 const gameArea = document.querySelector("#game-area");
 const player = document.querySelector("#player");
+
+const gameWrapper = document.querySelector("#game-wrapper");
 
 // ===== UI HELPERS =====
 
@@ -180,6 +184,9 @@ function startGame() {
   showOnly(gameUI);
   initPlayer();
   isRunning = true;
+  
+  // Activar game-wrapper
+  gameWrapper.classList.add("game-active");
 
   // limpiar cualquier residuo por seguridad
   clearAllFalling();
@@ -198,7 +205,10 @@ function restartGame() {
   stopSpawning();
   clearAllFalling();
   isRunning = false;
+  // desactivar game-wrapper
+  gameWrapper.classList.remove("game-active");
 
+ 
   // reset lanes 
   laneX = [];
 }

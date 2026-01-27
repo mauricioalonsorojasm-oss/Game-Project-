@@ -24,17 +24,35 @@ body {
   max-width: 95vw;
   height: 720px;
   margin: 0 auto;
-
   border-radius: 16px;
   overflow: hidden;
+  background: none;
+
+}
+
+.game-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
 
   background-image: url("./images/background.png");
   background-size: 150%;
   background-position: center;
   background-repeat: no-repeat;
+
+  transition: filter 0.4s ease;
+  z-index: 0;
 }
 
-/* IMPORTANT: base layer behavior */
+.game-wrapper.game-active::before {
+  filter: blur(6px);
+  transform: scale(1.05); /* evita bordes al hacer blur */
+}
+
+
+
+
+/* base layer behavior */
 .ui-layer {
   position: absolute;
   inset: 0;
@@ -101,7 +119,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  
 
   color: #ffffff;
   font-size: 18px;
@@ -112,12 +130,25 @@ body {
   padding: 14px 18px;
   border-radius: 12px;
 
-  max-width: 1400px;
+  max-width: 1470px;
 }
 
+.score{
+  width: 90px;
+  height: 70px;
+ 
+}
+
+.lives-logo{
+  width: 90px;
+  height: 70px;
+
+}
+
+
 .lives img {
-  width: 34px;
-  height: 24px;
+  width: 70px;
+  height: 50px;
 }
 
 .hud-block {
