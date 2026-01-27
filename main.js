@@ -1,5 +1,3 @@
-
-
 // ===== DOM =====
 
 const startUI = document.querySelector("#start-ui");
@@ -11,7 +9,6 @@ const restartBtn = document.querySelector("#restart-btn");
 
 const gameArea = document.querySelector("#game-area");
 const player = document.querySelector("#player");
-
 const gameWrapper = document.querySelector("#game-wrapper");
 
 // ===== UI HELPERS =====
@@ -25,7 +22,7 @@ function showOnly(layerToShow) {
 
 // ===== GAME DATA =====
 
-const Recipe = ["ICE", "PISCO", "COLA"]; // combinacion correcta 
+const recipe = ["ICE", "PISCO", "COLA"]; // winning recipe
 
 const itemAssets = {
   ICE: "images/icecubes.png",
@@ -42,31 +39,41 @@ const itemAssets = {
 const itemTypes = Object.keys(itemAssets);
 
 function getRandomItemType() {
-  const i = Math.floor(Math.random() * itemTypes.length);
-  return itemTypes[i];
+  return itemTypes[Math.floor(Math.random() * itemTypes.length)];
 }
 
-// ===== 3 LANES LOGIC =====
+// ===== LANES =====
 
-const LANES = 3;
-const padding = 180;     // espacio a los bordes
-const PLAYER_W = 150;    // same as CSS
-const ITEM_W = 150;      // same as CSS
+const lanesCount = 3;
+const padding = 180;
 
-let laneX = [];          // posiciones left para cada lane
-let playerLane = 1;      // 0=izq, 1=centro, 2=der
+const playerWidth = 150;
+const playerHeight = 80;
+const playerBottomOffset = 14;
+
+const itemWidth = 150;
+const itemHeight = 150;
+
+let laneX = [];
+let playerLane = 1;
+
+// ===== LANES HELPERS =====
 
 function setupLanes() {
-  const w = gameArea.clientWidth;
-  const usable = w - padding * 2;
-  const step = usable / (LANES - 1);
+  const width = gameArea.clientWidth;
+  const usable = width - padding * 2;
+  const step = usable / (lanesCount - 1);
 
   laneX = [];
-  for (let i = 0; i < LANES; i++) {
+  for (let i = 0; i < lanesCount; i++) {
     const laneCenter = padding + step * i;
-    const left = laneCenter - PLAYER_W / 2;
-    laneX.push(left);
+    laneX.push(laneCenter - playerWidth / 2);
   }
+}
+
+function getLaneLeft(lane, elementWidth) {
+  const laneCenter = laneX[lane] + playerWidth / 2;
+  return laneCenter - elementWidth / 2;
 }
 
 function placePlayer() {
@@ -75,18 +82,19 @@ function placePlayer() {
 
 function initPlayer() {
   setupLanes();
-  playerLane = 1; // centro
+  playerLane = 1;
   placePlayer();
 }
 
-// Recalcular lanes si cambia tamaño de ventana
+// ===== RESIZE =====
+
 window.addEventListener("resize", () => {
-  if (laneX.length === 0) return; // si aún no empezó el juego
+  if (laneX.length === 0) return;
   setupLanes();
   placePlayer();
 });
 
-// ===== PLAYER INPUT (SOLO 1 LISTENER) =====
+// ===== INPUT =====
 
 window.addEventListener("keydown", (e) => {
   if (gameUI.classList.contains("hidden")) return;
@@ -97,7 +105,7 @@ window.addEventListener("keydown", (e) => {
   }
 
   if (e.key === "ArrowRight") {
-    playerLane = Math.min(2, playerLane + 1);
+    playerLane = Math.min(lanesCount - 1, playerLane + 1);
     placePlayer();
   }
 });
@@ -105,65 +113,89 @@ window.addEventListener("keydown", (e) => {
 // ===== TIMERS / STATE =====
 
 let spawnTimer = null;
-let fallTimers = new Set(); // intervals de cada item para poder limpiarlos
+let fallTimers = new Set(); // guarda intervals activos para limpieza global
 let isRunning = false;
 
-// ===== HELPERS =====
+// ===== CLEANUP =====
 
 function clearAllFalling() {
-  // detener todos los intervals de caída
-  fallTimers.forEach((id) => clearInterval(id));
+  fallTimers.forEach(clearInterval);
   fallTimers.clear();
-
-  // borrar elementos
   gameArea.querySelectorAll(".falling").forEach((el) => el.remove());
 }
 
 function stopSpawning() {
-  if (spawnTimer !== null) {
+  if (spawnTimer) {
     clearInterval(spawnTimer);
     spawnTimer = null;
   }
 }
 
-// ===== SPAWN (3 LANES) + FALL =====
+// ===== COLLISIONS (COORDENADAS PROPIAS) =====
+
+function getPlayerBox() {
+  return {
+    x: laneX[playerLane],
+    y: gameArea.clientHeight - playerHeight - playerBottomOffset,
+    w: playerWidth,
+    h: playerHeight,
+  };
+}
+
+function getItemBox(top, lane) {
+  return {
+    x: getLaneLeft(lane, itemWidth),
+    y: top,
+    w: itemWidth,
+    h: itemHeight,
+  };
+}
+
+function isCaught(itemBox, playerBox) {
+  const verticalHit = itemBox.y + itemBox.h >= playerBox.y;
+  const horizontalHit =
+    itemBox.x < playerBox.x + playerBox.w &&
+    itemBox.x + itemBox.w > playerBox.x;
+
+  return verticalHit && horizontalHit;
+}
+
+// ===== SPAWN + FALL =====
 
 function spawnOneRandomItem() {
-
-  // seguridad: si aún no hay lanes, no spawnear
-  if (laneX.length !== LANES) return;
+  if (laneX.length !== lanesCount) return;
 
   const type = getRandomItemType();
-  const lane = Math.floor(Math.random() * LANES);
+  const lane = Math.floor(Math.random() * lanesCount);
 
   const img = document.createElement("img");
   img.src = itemAssets[type];
-  img.alt = type;
   img.classList.add("falling");
 
-  // metadata para colisiones
-  //img.dataset.type = type;
-  //img.dataset.lane = String(lane);
-
-  // posicionar en el lane
-  const laneCenter = laneX[lane] + PLAYER_W / 2;
-  const left = laneCenter - ITEM_W / 2;
-
-  img.style.left = left + "px";
+  let top = 0;
+  img.style.left = getLaneLeft(lane, itemWidth) + "px";
   img.style.top = "0px";
 
   gameArea.appendChild(img);
 
-  // ===== FALLING LOGIC =====
-  let top = 0;
-  const speed = 5;        // px por tick
-  const interval = 20;    // ms
+  const speed = 5;
+  const interval = 20;
 
   const fallInterval = setInterval(() => {
     top += speed;
     img.style.top = top + "px";
 
-    // si llega al fondo
+    const itemBox = getItemBox(top, lane);
+    const playerBox = getPlayerBox();
+
+    if (isCaught(itemBox, playerBox)) {
+      clearInterval(fallInterval);
+      fallTimers.delete(fallInterval);
+      img.remove();
+      console.log("Caught:", type);
+      return;
+    }
+
     if (top > gameArea.clientHeight - 80) {
       clearInterval(fallInterval);
       fallTimers.delete(fallInterval);
@@ -178,45 +210,35 @@ function spawnOneRandomItem() {
 // ===== GAME FLOW =====
 
 function startGame() {
-  // evita duplicar start si ya está corriendo
   if (isRunning) return;
 
   showOnly(gameUI);
   initPlayer();
-  isRunning = true;
-  
-  // Activar game-wrapper
   gameWrapper.classList.add("game-active");
 
-  // limpiar cualquier residuo por seguridad
   clearAllFalling();
   stopSpawning();
 
-  // spawnea 1 y luego arranca interval
+  isRunning = true;
   spawnOneRandomItem();
   spawnTimer = setInterval(spawnOneRandomItem, 1500);
 }
 
 function restartGame() {
-  // volver al start UI
   showOnly(startUI);
-
-  // parar todo lo del juego
   stopSpawning();
   clearAllFalling();
-  isRunning = false;
-  // desactivar game-wrapper
-  gameWrapper.classList.remove("game-active");
 
- 
-  // reset lanes 
+  isRunning = false;
   laneX = [];
+  gameWrapper.classList.remove("game-active");
 }
 
-// ===== BUTTONS (SOLO 1 CADA UNO) =====
+// ===== BUTTONS =====
 
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", restartGame);
 
 // ===== INIT =====
+
 showOnly(startUI);
