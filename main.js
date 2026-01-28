@@ -20,6 +20,28 @@ function showOnly(layerToShow) {
   layerToShow.classList.remove("hidden");
 }
 
+// ====== HUD References ====
+const scoreEl = document.querySelector("#score");
+const livesEl = document.querySelector("#lives");
+
+// ===== SOUND EFFECTS =====
+
+const soundCatch = new Audio("sounds/catch.mp3");
+const soundLifeLost = new Audio("sounds/life-lost.mp3");
+const soundGameOver = new Audio("sounds/game-over.mp3");
+const soundGameStart = new Audio("sounds/game-start.mp3");
+
+// ===== BACKGROUND MUSIC =====
+
+const bgMusic = new Audio("sounds/bg-music.mp3");
+bgMusic.loop = true;      // repeat forever
+bgMusic.volume = 0.3;    // softer than effects
+
+
+function playSound(sound) {
+  sound.currentTime = 0; // rewind if played recently
+  sound.play();
+}
 // ===== GAME DATA =====
 
 const recipe = ["ICE", "PISCO", "COLA"];
@@ -56,13 +78,12 @@ const lanesCount = laneX.length;
 
 let playerLane = 1;
 
-// ===== DIMENSIONS =====
+// ===== DIMENSIONS (USED BY CLASS) =====
 
 const playerWidth = 150;
 const playerHeight = 80;
 const playerBottomOffset = 14;
 
-const itemWidth = 150;
 const itemHeight = 150;
 
 // ===== PLAYER =====
@@ -76,7 +97,7 @@ function initPlayer() {
   placePlayer();
 }
 
-// ===== INPUT (BEGINNER FRIENDLY) =====
+// ===== INPUT =====
 
 function moveLeft() {
   playerLane = Math.max(0, playerLane - 1);
@@ -88,26 +109,90 @@ function moveRight() {
   placePlayer();
 }
 
-function handleKeyDown(e) {
+document.addEventListener("keydown", (e) => {
   if (!isRunning) return;
 
-  if (e.key === "ArrowLeft") {
-    moveLeft();
-  } else if (e.key === "ArrowRight") {
-    moveRight();
+  if (e.key === "ArrowLeft") moveLeft();
+  if (e.key === "ArrowRight") moveRight();
+});
+
+
+// ===== HUD =====
+
+function updateHUD() {
+  scoreEl.textContent = score;
+
+  livesEl.innerHTML = "";
+  for (let i = 0; i < lives; i++) {
+    const img = document.createElement("img");
+    img.src = "images/LifeGlass.png";
+    img.alt = "life";
+    livesEl.appendChild(img);
   }
 }
 
-document.addEventListener("keydown", handleKeyDown);
 
-// ===== SPAWN TIMER =====
+
+// ===== GAME RULES =====
+
+function handleCatch(type) {
+  const expectedType = recipe[recipeStep];
+
+  // Forbidden item
+  if (!recipe.includes(type)) {
+    lives--;
+    playSound(soundLifeLost)
+    updateHUD();
+    if (lives <= 0) endGame();
+    return;
+  }
+
+  // Wrong order
+  if (type !== expectedType) {
+    lives--;
+    playSound(soundLifeLost)
+     updateHUD();
+    if (lives <= 0) endGame();
+    return;
+  }
+
+  // Correct item
+  score++;
+  playSound(soundCatch);
+  updateHUD();
+  recipeStep++;
+
+  // Recipe completed → restart sequence
+  if (recipeStep === recipe.length) {
+    recipeStep = 0;
+  }
+}
+
+function handleMiss(type) {
+  const expectedType = recipe[recipeStep];
+
+  // Missing forbidden items is OK
+  if (!recipe.includes(type)) return;
+
+  // Missing a recipe item but not the expected one is OK
+  if (type !== expectedType) return;
+
+  // Missed expected item
+  lives--;
+  playSound(soundLifeLost)
+  updateHUD();
+  if (lives <= 0) endGame();
+}
+
+// ===== SPAWN =====
 
 let spawnTimer = null;
 
-// ===== CLEANUP =====
+function spawnOneRandomItem() {
+  const type = getRandomItemType();
+  const lane = Math.floor(Math.random() * lanesCount);
 
-function clearAllFalling() {
-  gameArea.querySelectorAll(".falling").forEach((el) => el.remove());
+  new FallingItem(type, lane);
 }
 
 function stopSpawning() {
@@ -117,104 +202,22 @@ function stopSpawning() {
   }
 }
 
-// ===== COLLISIONS =====
-
-function getPlayerBox() {
-  return {
-    x: laneX[playerLane],
-    y: gameArea.clientHeight - playerHeight - playerBottomOffset,
-    w: playerWidth,
-    h: playerHeight,
-  };
-}
-
-function isCaught(itemBox, playerBox) {
-  const verticalHit = itemBox.y + itemBox.h >= playerBox.y;
-  const horizontalHit =
-    itemBox.x < playerBox.x + playerBox.w &&
-    itemBox.x + itemBox.w > playerBox.x;
-
-  return verticalHit && horizontalHit;
-}
-
-// ===== GAME RULES =====
-
-// function handleCatch(type) {
-//   const expectedType = recipe[recipeStep];
-
-// 
-
-// function handleMiss() {
-//  
-
-// ===== SPAWN + FALL  =====
-
-function getRandomLane() {
-  return Math.floor(Math.random() * lanesCount);
-}
-
-function createFallingImage(type, lane) {
-  const img = document.createElement("img");
-  img.src = itemAssets[type];
-  img.classList.add("falling");
-
-  img.style.left = laneX[lane] + "px";
-  img.style.top = "0px";
-
-  gameArea.appendChild(img);
-  return img;
-}
-
-function moveDown(img, currentTop) {
-  const newTop = currentTop + 5;
-  img.style.top = newTop + "px";
-  return newTop;
-}
-
-function wasCaught(lane, top) {
-  const itemBox = {
-    x: laneX[lane],
-    y: top,
-    w: itemWidth,
-    h: itemHeight,
-  };
-
-  const playerBox = getPlayerBox();
-  return isCaught(itemBox, playerBox);
-}
-
-function wasMissed(top) {
-  return top > gameArea.clientHeight - 80;
-}
-
-function removeItem(img, intervalId) {
-  clearInterval(intervalId);
-  img.remove();
-}
-
-function spawnOneRandomItem() {
-  const type = getRandomItemType();
-  const lane = getRandomLane();
-
-  const img = createFallingImage(type, lane);
-  let top = 0;
-
-  const fallInterval = setInterval(() => {
-    top = moveDown(img, top);
-
-  }, 20);
+function clearAllFalling() {
+  gameArea.querySelectorAll(".falling").forEach((el) => el.remove());
 }
 
 // ===== GAME FLOW =====
 
 function startGame() {
   if (isRunning) return;
-
+  bgMusic.currentTime = 0;
+  bgMusic.play();
+  playSound(soundGameStart);
+  showOnly(gameUI);
   score = 0;
   lives = 3;
   recipeStep = 0;
-
-  showOnly(gameUI);
+  updateHUD();
   initPlayer();
   gameWrapper.classList.add("game-active");
 
@@ -227,6 +230,9 @@ function startGame() {
 }
 
 function endGame() {
+  playSound(soundGameOver);
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
   stopSpawning();
   clearAllFalling();
   isRunning = false;
@@ -235,6 +241,8 @@ function endGame() {
 }
 
 function restartGame() {
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
   showOnly(startUI);
   stopSpawning();
   clearAllFalling();

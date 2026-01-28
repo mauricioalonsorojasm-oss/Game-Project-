@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,17 +9,11 @@
 
   <body>
     <main class="app">
-
       <!-- GAME WRAPPER  -->
       <section id="game-wrapper" class="game-wrapper">
-
         <!-- START UI -->
         <div id="start-ui" class="ui-layer">
-          <img
-            class="logo"
-            src="images/logo.png"
-            alt="Pisco Rush logo"
-          />
+          <img class="logo" src="images/logo.png" alt="Pisco Rush logo" />
 
           <p class="instructions">
             Catch the ingredients in order:<br />
@@ -31,22 +25,23 @@
             <img src="images/StartPlaying.png" alt="Play" />
           </button>
         </div>
-
-        <!-- GAME UI (HUD + PLAYER + ITEMS) -->
+        <!-- GAME UI (PLAYER + ITEMS ONLY) -->
         <div id="game-ui" class="ui-layer hidden">
-
-          <!-- HUD -->
           <header class="hud">
             <div class="hud-block">
               <span class="hud-label">
-                <img src="images/score.png" alt="score" class="score">
+                <img src="images/score.png" alt="score" class="score" />
               </span>
               <span id="score">0</span>
             </div>
 
             <div class="hud-block">
               <span class="hud-label">
-                <img src="images/lives.png" alt="lives-logo" class="lives-logo">
+                <img
+                  src="images/lives.png"
+                  alt="lives-logo"
+                  class="lives-logo"
+                />
               </span>
               <div id="lives" class="lives">
                 <img src="images/LifeGlass.png" alt="life" />
@@ -54,8 +49,6 @@
                 <img src="images/LifeGlass.png" alt="life" />
               </div>
             </div>
-
-           
           </header>
 
           <!-- GAME AREA -->
@@ -68,26 +61,19 @@
             />
             <!-- Falling items go here -->
           </div>
-
         </div>
 
         <!-- GAME OVER UI -->
         <div id="gameover-ui" class="ui-layer hidden">
-          <img
-            class="gameover-img"
-            src="images/GameOver.png"
-            alt="Game Over"
-          />
+          <img class="gameover-img" src="images/GameOver.png" alt="Game-Over" />
 
           <button id="restart-btn" class="btn">
             <img src="images/tryAgain.png" alt="restart-btn" />
           </button>
         </div>
-
       </section>
-
     </main>
-
+    <script src="fallingItem.js"></script>
     <script src="main.js"></script>
   </body>
 </html>

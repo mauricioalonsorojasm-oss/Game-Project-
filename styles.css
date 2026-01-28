@@ -178,3 +178,9 @@ body {
   top: 0;           
   transform: none;
 }
+
+.gameover-img {
+  width: 800px;
+  height: auto;
+  
+}
