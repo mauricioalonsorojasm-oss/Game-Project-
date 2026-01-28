@@ -35,8 +35,9 @@ const soundGameStart = new Audio("sounds/game-start.mp3");
 
 const bgMusic = new Audio("sounds/bg-music.mp3");
 bgMusic.loop = true;      // repeat forever
-bgMusic.volume = 0.3;    // softer than effects
+bgMusic.volume = 0.5;    // softer than effects
 
+// ===== PLAYSOUND FUNCTION =====
 
 function playSound(sound) {
   sound.currentTime = 0; // rewind if played recently
