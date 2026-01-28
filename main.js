@@ -22,7 +22,7 @@ function showOnly(layerToShow) {
 
 // ===== GAME DATA =====
 
-const recipe = ["ICE", "PISCO", "COLA"]; // winning recipe
+const recipe = ["ICE", "PISCO", "COLA"];
 
 const itemAssets = {
   ICE: "images/icecubes.png",
@@ -42,10 +42,21 @@ function getRandomItemType() {
   return itemTypes[Math.floor(Math.random() * itemTypes.length)];
 }
 
-// ===== LANES =====
+// ===== GAME STATE =====
 
-const lanesCount = 3;
-const padding = 180;
+let score = 0;
+let lives = 3;
+let recipeStep = 0;
+let isRunning = false;
+
+// ===== LANES (FIXED) =====
+
+const laneX = [300, 660, 1020];
+const lanesCount = laneX.length;
+
+let playerLane = 1;
+
+// ===== DIMENSIONS =====
 
 const playerWidth = 150;
 const playerHeight = 80;
@@ -54,73 +65,48 @@ const playerBottomOffset = 14;
 const itemWidth = 150;
 const itemHeight = 150;
 
-let laneX = [];
-let playerLane = 1;
-
-// ===== LANES HELPERS =====
-
-function setupLanes() {
-  const width = gameArea.clientWidth;
-  const usable = width - padding * 2;
-  const step = usable / (lanesCount - 1);
-
-  laneX = [];
-  for (let i = 0; i < lanesCount; i++) {
-    const laneCenter = padding + step * i;
-    laneX.push(laneCenter - playerWidth / 2);
-  }
-}
-
-function getLaneLeft(lane, elementWidth) {
-  const laneCenter = laneX[lane] + playerWidth / 2;
-  return laneCenter - elementWidth / 2;
-}
+// ===== PLAYER =====
 
 function placePlayer() {
   player.style.left = laneX[playerLane] + "px";
 }
 
 function initPlayer() {
-  setupLanes();
   playerLane = 1;
   placePlayer();
 }
 
-// ===== RESIZE =====
+// ===== INPUT (BEGINNER FRIENDLY) =====
 
-window.addEventListener("resize", () => {
-  if (laneX.length === 0) return;
-  setupLanes();
+function moveLeft() {
+  playerLane = Math.max(0, playerLane - 1);
   placePlayer();
-});
+}
 
-// ===== INPUT =====
+function moveRight() {
+  playerLane = Math.min(lanesCount - 1, playerLane + 1);
+  placePlayer();
+}
 
-window.addEventListener("keydown", (e) => {
-  if (gameUI.classList.contains("hidden")) return;
+function handleKeyDown(e) {
+  if (!isRunning) return;
 
   if (e.key === "ArrowLeft") {
-    playerLane = Math.max(0, playerLane - 1);
-    placePlayer();
+    moveLeft();
+  } else if (e.key === "ArrowRight") {
+    moveRight();
   }
+}
 
-  if (e.key === "ArrowRight") {
-    playerLane = Math.min(lanesCount - 1, playerLane + 1);
-    placePlayer();
-  }
-});
+document.addEventListener("keydown", handleKeyDown);
 
-// ===== TIMERS / STATE =====
+// ===== SPAWN TIMER =====
 
 let spawnTimer = null;
-let fallTimers = new Set(); // guarda intervals activos para limpieza global
-let isRunning = false;
 
 // ===== CLEANUP =====
 
 function clearAllFalling() {
-  fallTimers.forEach(clearInterval);
-  fallTimers.clear();
   gameArea.querySelectorAll(".falling").forEach((el) => el.remove());
 }
 
@@ -131,7 +117,7 @@ function stopSpawning() {
   }
 }
 
-// ===== COLLISIONS (COORDENADAS PROPIAS) =====
+// ===== COLLISIONS =====
 
 function getPlayerBox() {
   return {
@@ -139,15 +125,6 @@ function getPlayerBox() {
     y: gameArea.clientHeight - playerHeight - playerBottomOffset,
     w: playerWidth,
     h: playerHeight,
-  };
-}
-
-function getItemBox(top, lane) {
-  return {
-    x: getLaneLeft(lane, itemWidth),
-    y: top,
-    w: itemWidth,
-    h: itemHeight,
   };
 }
 
@@ -160,57 +137,82 @@ function isCaught(itemBox, playerBox) {
   return verticalHit && horizontalHit;
 }
 
-// ===== SPAWN + FALL =====
+// ===== GAME RULES =====
 
-function spawnOneRandomItem() {
-  if (laneX.length !== lanesCount) return;
+// function handleCatch(type) {
+//   const expectedType = recipe[recipeStep];
 
-  const type = getRandomItemType();
-  const lane = Math.floor(Math.random() * lanesCount);
+// 
 
+// function handleMiss() {
+//  
+
+// ===== SPAWN + FALL  =====
+
+function getRandomLane() {
+  return Math.floor(Math.random() * lanesCount);
+}
+
+function createFallingImage(type, lane) {
   const img = document.createElement("img");
   img.src = itemAssets[type];
   img.classList.add("falling");
 
-  let top = 0;
-  img.style.left = getLaneLeft(lane, itemWidth) + "px";
+  img.style.left = laneX[lane] + "px";
   img.style.top = "0px";
 
   gameArea.appendChild(img);
+  return img;
+}
 
-  const speed = 5;
-  const interval = 20;
+function moveDown(img, currentTop) {
+  const newTop = currentTop + 5;
+  img.style.top = newTop + "px";
+  return newTop;
+}
+
+function wasCaught(lane, top) {
+  const itemBox = {
+    x: laneX[lane],
+    y: top,
+    w: itemWidth,
+    h: itemHeight,
+  };
+
+  const playerBox = getPlayerBox();
+  return isCaught(itemBox, playerBox);
+}
+
+function wasMissed(top) {
+  return top > gameArea.clientHeight - 80;
+}
+
+function removeItem(img, intervalId) {
+  clearInterval(intervalId);
+  img.remove();
+}
+
+function spawnOneRandomItem() {
+  const type = getRandomItemType();
+  const lane = getRandomLane();
+
+  const img = createFallingImage(type, lane);
+  let top = 0;
 
   const fallInterval = setInterval(() => {
-    top += speed;
-    img.style.top = top + "px";
+    top = moveDown(img, top);
 
-    const itemBox = getItemBox(top, lane);
-    const playerBox = getPlayerBox();
-
-    if (isCaught(itemBox, playerBox)) {
-      clearInterval(fallInterval);
-      fallTimers.delete(fallInterval);
-      img.remove();
-      console.log("Caught:", type);
-      return;
-    }
-
-    if (top > gameArea.clientHeight - 80) {
-      clearInterval(fallInterval);
-      fallTimers.delete(fallInterval);
-      img.remove();
-      console.log("Item missed");
-    }
-  }, interval);
-
-  fallTimers.add(fallInterval);
+  }, 20);
 }
 
 // ===== GAME FLOW =====
 
 function startGame() {
   if (isRunning) return;
+
+  score = 0;
+  lives = 3;
+  recipeStep = 0;
 
   showOnly(gameUI);
   initPlayer();
@@ -224,13 +226,19 @@ function startGame() {
   spawnTimer = setInterval(spawnOneRandomItem, 1500);
 }
 
+function endGame() {
+  stopSpawning();
+  clearAllFalling();
+  isRunning = false;
+  gameWrapper.classList.remove("game-active");
+  showOnly(gameOverUI);
+}
+
 function restartGame() {
   showOnly(startUI);
   stopSpawning();
   clearAllFalling();
-
   isRunning = false;
-  laneX = [];
   gameWrapper.classList.remove("game-active");
 }
 
