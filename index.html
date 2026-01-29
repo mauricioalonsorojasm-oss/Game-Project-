@@ -17,8 +17,18 @@
 
           <p class="instructions">
             Catch the ingredients in order:<br />
-            <strong>ICE → PISCO → COLA</strong><br />
-            Wrong order or wrong bottle = lose a life!
+
+            <strong class="recipe-text">
+              ICE <img src="images/icecubes.png" alt="ICE" /> → PISCO
+              <img src="images/pisco.png" alt="PISCO" /> → COLA
+              <img src="images/cola.png" alt="COLA" />
+            </strong>
+
+            <br />
+            <span class="warning-text">
+              Wrong order or wrong bottle = lose a life!
+              <img src="images/LifeGlassBroken.png" alt="life lost" />
+            </span>
           </p>
 
           <button id="start-btn" class="btn">
@@ -66,6 +76,10 @@
         <!-- GAME OVER UI -->
         <div id="gameover-ui" class="ui-layer hidden">
           <img class="gameover-img" src="images/GameOver.png" alt="Game-Over" />
+          <p id="final-score" class="final-score">
+            <img src="images/score.png" alt="score" class="score" />
+            <span id="final-score-value">0</span>
+          </p>
 
           <button id="restart-btn" class="btn">
             <img src="images/tryAgain.png" alt="restart-btn" />

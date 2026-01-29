@@ -23,6 +23,9 @@ function showOnly(layerToShow) {
 // ====== HUD References ====
 const scoreEl = document.querySelector("#score");
 const livesEl = document.querySelector("#lives");
+const finalScoreValueEl = document.querySelector("#final-score-value");
+
+
 
 // ===== SOUND EFFECTS =====
 
@@ -59,10 +62,26 @@ const itemAssets = {
   FERNET: "images/fernet.png",
 };
 
-const itemTypes = Object.keys(itemAssets);
+//const itemTypes = Object.keys(itemAssets);
+
+
+const spawnPool = [
+  // Recipe items (más probables)
+  "ICE","ICE","ICE","ICE",
+  "PISCO","PISCO","PISCO","PISCO",
+  "COLA","COLA","COLA","COLA",
+
+  // Forbidden items (menos probables)
+  "TEQUILA",
+  "VODKA",
+  "WHISKY",
+  "VERMOUTH",
+  "GIN",
+  "FERNET",
+];
 
 function getRandomItemType() {
-  return itemTypes[Math.floor(Math.random() * itemTypes.length)];
+  return spawnPool[Math.floor(Math.random() * spawnPool.length)];
 }
 
 // ===== GAME STATE =====
@@ -212,8 +231,11 @@ function clearAllFalling() {
 function startGame() {
   if (isRunning) return;
   bgMusic.currentTime = 0;
+setTimeout(() => {
   bgMusic.play();
-  playSound(soundGameStart);
+}, 2000);
+
+playSound(soundGameStart);
   showOnly(gameUI);
   score = 0;
   lives = 3;
@@ -237,7 +259,9 @@ function endGame() {
   stopSpawning();
   clearAllFalling();
   isRunning = false;
-  gameWrapper.classList.remove("game-active");
+
+  finalScoreValueEl.textContent = score;
+
   showOnly(gameOverUI);
 }
 

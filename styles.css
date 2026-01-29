@@ -65,8 +65,8 @@ body {
 /* Start UI: top aligned */
 #start-ui {
   justify-content: flex-start; /* vertical top */
-  padding-top: 20px;           /* move down from top */
-  gap: 80px;
+  padding-top: 0;           /* move down from top */
+  gap: 20px;
 }
 
 .logo {
@@ -79,15 +79,39 @@ body {
 
 .instructions {
   color: #ffffff;
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: 20px;
+  line-height: 1.6;
   text-align: center;
 
   background: rgba(0, 0, 0, 0.6);
-  padding: 14px 18px;
-  border-radius: 12px;
+  padding: 24px 32px;
+  border-radius: 16px;
 
-  max-width: 600px;
+  max-width: 720px;
+}
+
+.recipe-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.recipe-text img {
+  width: 50px;
+  height: auto;
+}
+
+.warning-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.warning-text img {
+  width: 50px;
+  height: auto;
 }
 
 
@@ -99,8 +123,8 @@ body {
 }
 
 .btn img {
-  width: 320px;
-  max-width: 90%;
+  width: 380px;
+  max-width: 95%;
   height: auto;
 }
 
@@ -134,26 +158,36 @@ body {
 }
 
 .score{
-  width: 90px;
+  width: auto;
   height: 70px;
  
 }
 
+.lives {
+  display: flex;
+  gap: 10px;
+  width: 210px;           
+  justify-content: flex-start;
+}
+
 .lives-logo{
-  width: 90px;
+  width: auto;
   height: 70px;
+  flex-shrink: 0;
 
 }
 
 
 .lives img {
-  width: 70px;
+  width: auto;
   height: 50px;
 }
 
 .hud-block {
   display: flex;
   gap: 20px;
+  align-items: center;
+  font-size: 25px;
 }
 
 /* Game area */
@@ -166,21 +200,40 @@ body {
 .player {
   position: absolute;
   bottom: 14px;
-  width: 150px;
+  width: 150px;        /* ancho del player */
   transform: none;   
 }
 
 /* Falling items */
 .falling {
   position: absolute;
-  width: 150px;      /* mismo ancho que player */
+  width: 110px;      /* ancho del item */
   height: auto;
   top: 0;           
   transform: none;
 }
 
 .gameover-img {
-  width: 800px;
+  width: 500px;
   height: auto;
   
+}
+
+.final-score {
+  
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.6);
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  align-items: center;
+  display: flex;
+  
+}
+
+.final-score img {
+  width: auto;
+  height: 100px;
 }
