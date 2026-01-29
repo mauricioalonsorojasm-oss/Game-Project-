@@ -1,227 +1,131 @@
-# Game-Project-
-This repository is for my first game project in JS
+🍸 Pisco Rush
 
+Pisco Rush is a browser-based arcade game built using HTML, CSS, and beginner level JavaScript.
+The goal of the game is to catch the correct ingredients in the correct order to prepare a Pisco drink, while avoiding incorrect bottles.
 
-+++ Game concept +++
+This project was developed as part of the Ironhack Web Development Bootcamp, with a focus on DOM manipulation, game logic, and UI state management.
 
-You control an empty glass that moves left/right at the bottom. Ingredients fall from the top.
-Your goal is to catch the recipe in the correct order:
+🎮 Game Overview
 
-Recipe (Piscola):
+Items fall from the top of the screen in different lanes.
 
-Ice → 2) Pisco → 3) Coca-Cola
+The player controls a glass that can move left and right.
 
-When you complete the sequence in order: +1 point and the recipe progress resets.
+Ingredients must be caught in the following order:
 
-Fail rules:
+ICE → PISCO → COLA
 
-Catching the right items in the wrong order → fail → lose 1 life → reset recipe progress
+Catching an ingredient in the wrong order or catching a forbidden bottle results in losing a life.
 
-Catching a wrong alcohol (e.g., Tequila) → automatic fail → lose 1 life → reset recipe progress
+The game ends when all lives are lost.
 
+🕹️ Controls
 
-+++  App states (3+) +++
+Left Arrow (←): Move the glass left
 
-START -> GAME -> WIN
-           \-> LOSE
-WIN/LOSE -> Restart -> START
+Right Arrow (→): Move the glass right
 
+Mouse / Click: Start or restart the game
 
-++++ State details ++++
- 
-START
+🧠 Game Rules
 
-Title: “Make the Perfect Piscola”
+Only recipe ingredients increase the score.
 
-Instructions: “Catch Ice → Pisco → Coca-Cola (in that order)”
+Forbidden bottles can appear and should be avoided.
 
-Start button
+The recipe order must be respected.
 
-GAME
+Each mistake removes one life.
 
-Game area + HUD: Lives, Score, Current Step (e.g. “Step 1/3: Ice”)
+The score increases with each correct ingredient caught.
 
-WIN
+✨ Features
 
-“Bartender level: unlocked!”
+Weighted item spawn system (recipe ingredients appear more frequently)
 
-Show score
+HUD displaying score and remaining lives
 
-Restart button
+Start screen and Game Over screen
 
-LOSE
+Background music and sound effects
 
-“Glass shattered!” / “Wrong mix!”
+Blurred background during gameplay and Game Over
 
-Restart button
+Simple UI animations
 
-Win condition ideas
+Clean separation between game logic and UI
 
-Score target (e.g. 5 piscolas) OR survive time (e.g. 45s)
+🧩 Project Structure
+├── index.html
+├── styles.css
+├── main.js
+├── fallingItem.js
+├── images/
+│   ├── background.png
+│   ├── icecubes.png
+│   ├── pisco.png
+│   ├── cola.png
+│   └── ...
+├── sounds/
+│   ├── bg-music.mp3
+│   ├── catch.mp3
+│   ├── life-lost.mp3
+│   └── game-over.mp3
+└── README.md
 
+🛠️ Technologies Used
 
-++++ Layout: where game elements are +++
+HTML5
 
-+--------------------------------------------------+
-| Lives: 3    Score: 0    Recipe: ICE (1/3)        |
-+--------------------------------------------------+
-|                                                  |
-|        falling items: 🧊  🥃  🥤  🍋  🍸           |
-|                                                  |
-|                                                  |
-|                                                  |
-|                   [   GLASS   ]                  |
-+--------------------------------------------------+
-| Controls: ← →                                    |
-+--------------------------------------------------+
+CSS3
 
-Glass stays near bottom
+JavaScript (ES6)
 
-Items spawn randomly at top, fall down
+No external libraries or frameworks
 
-HUD shows the next required ingredient (super important UX)
+🚀 How to Run the Project
 
+Clone the repository:
 
+git clone <repository-url>
 
 
-+++ Movement of elements +++
+Open index.html in your browser
+(Using VS Code Live Server is recommended)
 
-Glass movement
+📚 Learning Objectives
 
-Keyboard: ArrowLeft / ArrowRight
+This project was built to practice and reinforce:
 
-Smooth movement while key held
+DOM manipulation
 
-Clamp inside game area
+JavaScript classes
 
-Falling items
+Game state management
 
-Each item has:
+Timers (setInterval, setTimeout)
 
-type (ICE / PISCO / COKE / TEQUILA / etc.)
+Basic collision handling
 
-x, y, speed, size
+Code organization
 
-Each frame: y += speed
+UI/UX fundamentals for browser games
 
-If out of bounds: remove item
+🔮 Possible Improvements
 
-Game loop
+Progressive difficulty system
 
-requestAnimationFrame recommended
+Persistent high score using localStorage
 
-Separate concerns:
+Mobile / touch controls
 
-update() (movement, collisions, state checks)
+Additional animations and visual feedback
 
-render() (DOM styles)
+New recipes and game modes
 
+👤 Author
 
-+++ Essential functionalities (MVP) +++
+Mauricio Rojas Morales
+Web Development Student – Ironhack
 
-State switching (start/game/win/lose + restart)
-
-Glass movement left/right (keyboard)
-
-Spawn falling items at interval with random X
-
-Falling physics (y increases each frame)
-
-Collision detection item vs glass
-
-Recipe progress system (ICE → PISCO → COKE)
-
-Lives system (fail costs 1 life)
-
-Score system (+1 on completed recipe)
-
-HUD updates (show lives, score, next required ingredient)
-
-Cleanup on restart (stop intervals/RAF, clear items, reset vars)
-
-
-
-
-+++ Bonus functionalities +++
-
-
-Combo / streak: extra points for consecutive successful recipes without fails
-
-Sound effects: catch / fail / success
-
-
-
-+++ Classes structure (DOM + Classes friendly) +++
-Game
-
-Responsibilities: state, loop, spawning, HUD, win/lose, recipe logic
-
-Props:
-
-state
-
-player (Glass)
-
-items[]
-
-score, lives
-
-recipe = ["ICE","PISCO","COKE"]
-
-recipeIndex = 0
-
-spawnIntervalId, rafId, lastTimestamp
-
-Methods:
-
-start()
-
-update(delta)
-
-render()
-
-spawnItem()
-
-handleCatch(item) ← recipe logic lives here
-
-fail(reason)
-
-completeRecipe()
-
-endWin() / endLose()
-
-reset() / stop()
-
-Glass (Player)
-
-Responsibilities: horizontal movement + DOM element
-
-Props: x, y, width, speed, direction, domEl
-
-Methods:
-
-setDirection(-1|0|1)
-
-update(delta, boundsWidth)
-
-render()
-
-getRect()
-
-FallingItem
-
-Responsibilities: represents any falling ingredient
-
-Props: type, x, y, size, speed, domEl
-
-Methods:
-
-update(delta)
-
-render()
-
-isOut(height)
-
-getRect()
-
-(Optionally extend into IngredientItem vs ForbiddenAlcoholItem, but not necessary for MVP.)
+🍹 Enjoy playing Pisco Rush!
