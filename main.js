@@ -25,20 +25,22 @@ const scoreEl = document.querySelector("#score");
 const livesEl = document.querySelector("#lives");
 const finalScoreValueEl = document.querySelector("#final-score-value");
 
-
-
 // ===== SOUND EFFECTS =====
 
 const soundCatch = new Audio("sounds/catch.mp3");
 const soundLifeLost = new Audio("sounds/life-lost.mp3");
 const soundGameOver = new Audio("sounds/game-over.mp3");
 const soundGameStart = new Audio("sounds/game-start.mp3");
+soundCatch.volume = 0.4;
+soundLifeLost.volume = 0.4;
+soundGameOver.volume = 0.5;
+soundGameStart.volume = 0.5;
 
 // ===== BACKGROUND MUSIC =====
 
 const bgMusic = new Audio("sounds/bg-music.mp3");
-bgMusic.loop = true;      // repeat forever
-bgMusic.volume = 0.5;    // softer than effects
+bgMusic.loop = true; // repeat forever
+bgMusic.volume = 0.2; // softer than effects
 
 // ===== PLAYSOUND FUNCTION =====
 
@@ -64,12 +66,20 @@ const itemAssets = {
 
 //const itemTypes = Object.keys(itemAssets);
 
-
 const spawnPool = [
   // Recipe items (más probables)
-  "ICE","ICE","ICE","ICE",
-  "PISCO","PISCO","PISCO","PISCO",
-  "COLA","COLA","COLA","COLA",
+  "ICE",
+  "ICE",
+  "ICE",
+  "ICE",
+  "PISCO",
+  "PISCO",
+  "PISCO",
+  "PISCO",
+  "COLA",
+  "COLA",
+  "COLA",
+  "COLA",
 
   // Forbidden items (menos probables)
   "TEQUILA",
@@ -136,7 +146,6 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowRight") moveRight();
 });
 
-
 // ===== HUD =====
 
 function updateHUD() {
@@ -151,8 +160,6 @@ function updateHUD() {
   }
 }
 
-
-
 // ===== GAME RULES =====
 
 function handleCatch(type) {
@@ -161,7 +168,7 @@ function handleCatch(type) {
   // Forbidden item
   if (!recipe.includes(type)) {
     lives--;
-    playSound(soundLifeLost)
+    playSound(soundLifeLost);
     updateHUD();
     if (lives <= 0) endGame();
     return;
@@ -170,8 +177,8 @@ function handleCatch(type) {
   // Wrong order
   if (type !== expectedType) {
     lives--;
-    playSound(soundLifeLost)
-     updateHUD();
+    playSound(soundLifeLost);
+    updateHUD();
     if (lives <= 0) endGame();
     return;
   }
@@ -199,7 +206,7 @@ function handleMiss(type) {
 
   // Missed expected item
   lives--;
-  playSound(soundLifeLost)
+  playSound(soundLifeLost);
   updateHUD();
   if (lives <= 0) endGame();
 }
@@ -231,11 +238,11 @@ function clearAllFalling() {
 function startGame() {
   if (isRunning) return;
   bgMusic.currentTime = 0;
-setTimeout(() => {
-  bgMusic.play();
-}, 2000);
+  setTimeout(() => {
+    bgMusic.play();
+  }, 2000);
 
-playSound(soundGameStart);
+  playSound(soundGameStart);
   showOnly(gameUI);
   score = 0;
   lives = 3;

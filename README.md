@@ -87,7 +87,7 @@ No external libraries or frameworks
 
 Clone the repository:
 
-git clone <repository-url>
+git clone <https://github.com/mauricioalonsorojasm-oss/Game-Project-.git>
 
 
 Open index.html in your browser

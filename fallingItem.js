@@ -25,8 +25,7 @@ class FallingItem {
   update() {
     this.moveDown();
 
-    const playerTop =
-      gameArea.clientHeight - playerHeight - playerBottomOffset;
+    const playerTop = gameArea.clientHeight - playerHeight - playerBottomOffset;
 
     const sameLaneAsPlayer = this.lane === playerLane;
     const reachedPlayer = this.top + itemHeight >= playerTop;
